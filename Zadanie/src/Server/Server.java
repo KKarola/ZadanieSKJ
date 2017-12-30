@@ -1,13 +1,11 @@
 package Server;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-
+/*
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class Server extends Thread{
     // tworzę pustą listę z plikami hostów
@@ -22,17 +20,13 @@ public class Server extends Thread{
     ArrayList<String> users;
     ArrayList<String> files;
 
-    public Server (int number, ArrayList<String> users) {
-        this.number = number;
-        this.users = users;
-    }
-
     public void run() {
         welcomeSocket = null;
 
         //tworzenie gnaizda nasłuchującego
         try {
             welcomeSocket = new ServerSocket(10000);
+
         } catch (IOException exc) {
             System.out.println("Error: " + exc);
         }
@@ -40,8 +34,8 @@ public class Server extends Thread{
         //połączenie klient-serwer
         try {
             while (true) {
-                connectionSocket = welcomeSocket.accept();
                 if(!welcomeSocket.isClosed()) {
+                    connectionSocket = welcomeSocket.accept();
                     inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                     outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                     clientSentence = inFromClient.readLine();
@@ -76,7 +70,7 @@ public class Server extends Thread{
                         outToClient.writeBytes("Zarejestrowany.");
                     } catch (IOException exc) {
                         System.out.println("Error: " + exc);
-                    }*/
+                    }
                 }
                 break;
             /*case "FILE":
@@ -84,7 +78,7 @@ public class Server extends Thread{
                 System.out.println(fileList);
                 outToClient.writeBytes("ADDED " + message.param + '\n');
                 files();
-                break; */
+                break;
             case "LIST":
                 System.out.println("lista plikow");
                 files();
@@ -142,3 +136,4 @@ public class Server extends Thread{
 
     }
 }
+*/

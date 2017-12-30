@@ -1,7 +1,5 @@
 package Client;
 
-import Server.Message;
-
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ClientMulti extends Thread {
+/*public class ClientMulti extends Thread {
     int number;
     Socket clientSocket;
     ServerSocket client;
@@ -62,7 +60,7 @@ public class ClientMulti extends Thread {
                     case "FILE":
                         /*fileList.add(message.param);
                         System.out.println(fileList);
-                        outToClient.writeBytes("ADDED " + message.param + '\n');*/
+                        outToClient.writeBytes("ADDED " + message.param + '\n');
                         break;
                     case "LIST":
                         System.out.println("lista plikow");
@@ -151,3 +149,4 @@ public class ClientMulti extends Thread {
     }
 
 }
+*/

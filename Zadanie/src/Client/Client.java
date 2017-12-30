@@ -30,13 +30,14 @@ public class Client extends Thread {
 
         //tworzenie gniazda, rejestracja klientów
         try {
-            clientSocket = new ServerSocket(0);
+            clientSocket = new ServerSocket(10000+number);
             //list();
             register();
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
         }
 
+        // 1watek - nasluchiwanie
         //wysyłanie zapytań do serwera
         try {
             while(true) {
@@ -65,6 +66,8 @@ public class Client extends Thread {
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
         }
+        // 2 watek 2 - do wysylania komunikatow np. 127.0.0.1 10003 LIST / GET / PUSH
+
     }
 
     public void message(String sentence) {
@@ -153,7 +156,7 @@ public class Client extends Thread {
     }
 
     public void register() {
-        Socket client = null;
+        Socket clientSocket = null;
         InetAddress inetAdress = null;
         outToServer = null;
         inFromServer = null;
@@ -162,7 +165,7 @@ public class Client extends Thread {
         //tworzenie gniazda
         try {
             inetAdress = InetAddress.getLocalHost();
-            client = new Socket(inetAdress, 10000);
+            clientSocket = new Socket("127.0.0.1", 10000);
         } catch (IOException exc) {
             System.out.println("Error: " + exc);
         }
@@ -170,10 +173,10 @@ public class Client extends Thread {
         //połączenie klient-serwer
         //while (true) {
             try {
-                outToServer = new DataOutputStream(client.getOutputStream());
-                //inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                //inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-                outToServer.writeBytes("REGISTER" + number + " " + inetAdress.getHostAddress() + " " + client.getLocalPort());
+                outToServer.writeBytes("REGISTER " + number + " " + inetAdress.getHostAddress() + " " + clientSocket.getLocalPort() + '\n');
                 //System.out.println(inFromServer.readLine());
             } catch (IOException exc){
                 System.out.println("Error: " + exc);
@@ -181,7 +184,7 @@ public class Client extends Thread {
         //}
 
         /*try {
-            client.close();
+            clientSocket.close();
         } catch (IOException exc) {
             System.out.println("Error " + exc);
         }

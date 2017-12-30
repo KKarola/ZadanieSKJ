@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 public class ServerMain {
     public static void main(String[] args) {
-       ArrayList<String> hostList=new ArrayList<>();
+        /*Server server = new Server();
+        server.start();*/
 
-        Server server = new Server(1, hostList);
-        server.start();
+        ServerListener serverListener = new ServerListener();
+        serverListener.start();
     }
 }
