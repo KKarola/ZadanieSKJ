@@ -1,5 +1,5 @@
 package Client;
-
+/*
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -39,3 +39,4 @@ public class ClientInfo extends Thread {
 
     }
 }
+*/

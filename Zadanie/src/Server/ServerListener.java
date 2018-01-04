@@ -3,10 +3,12 @@ package Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerListener extends Thread {
     public static final int PORT = 10000;
-    Socket connectionSocket;
+    protected Socket connectionSocket;
+    protected ArrayList<String> users = new ArrayList<String>();
 
     public void run() {
         ServerSocket welcomeSocket = null;
@@ -23,7 +25,7 @@ public class ServerListener extends Thread {
             try {
                 connectionSocket = welcomeSocket.accept();
                 if(!welcomeSocket.isClosed()) {
-                    ServerSender serverSender = new ServerSender(connectionSocket);
+                    ServerSender serverSender = new ServerSender(connectionSocket, users);
                     serverSender.start();
                 }
             } catch (IOException e) {
