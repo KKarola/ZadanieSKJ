@@ -24,6 +24,9 @@ public class MessageFromConsole {
             case "PULL":
                 pull(messageComponents[1], messageComponents[2]);
                 break;
+            case "PUSH":
+                push(messageComponents[1], messageComponents[2]);
+                break;
         }
     }
 
@@ -55,10 +58,9 @@ public class MessageFromConsole {
         }
 
         try {
-            //zapytanie do servera o listę
             byte[] bytes = stringToByte("LIST");
             outToServer.write(bytes);
-            //odpowiedź od servera
+
             byte[] byt = new byte[1024];
             inFromServer.read(byt);
             String answer = byteToString(byt);
@@ -112,5 +114,45 @@ public class MessageFromConsole {
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
+    }
+
+    public void push(String host, String fileName) {
+        int port = Integer.parseInt(host);
+        Socket socket = null;
+        OutputStream outputStream = null;
+        try {
+            socket = new Socket("127.0.0.1", PORT + port);
+            outputStream = socket.getOutputStream();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+
+        try {
+            byte[] bytes = stringToByte("PUSH " + fileName);
+            outputStream.write(bytes);
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+
+        try {
+            File transferFile = new File("D://TORrent_" + number + "//" + fileName);
+            FileInputStream fileInputStream = new FileInputStream(transferFile);
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = fileInputStream.read(bytesTab)) > 0 ) {
+                outputStream.write(bytesTab, 0, count);
+            }
+            outputStream.close();
+            fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+
     }
 }

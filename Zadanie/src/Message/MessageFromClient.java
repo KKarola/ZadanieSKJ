@@ -41,7 +41,7 @@ public class MessageFromClient {
                 sendFile(messageComponents[1]);
                 break;
             case "PUSH":
-
+                receiveFile(messageComponents[1]);
                 break;
         }
     }
@@ -119,7 +119,6 @@ public class MessageFromClient {
         try {
             File transferFile = new File("D://TORrent_" + number + "//" + fileName);
             FileInputStream fileInputStream = new FileInputStream(transferFile);
-
             byte[] bytesTab = new byte[1024];
             int count;
             while ((count = fileInputStream.read(bytesTab)) > 0 ) {
@@ -127,6 +126,21 @@ public class MessageFromClient {
             }
             outputStream.close();
             fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public void receiveFile(String fileName) {
+        try {
+            File files = new File("D://TORrent_" + number + "//" + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(files);
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = inputStream.read(bytesTab)) > 0) {
+                fileOutputStream.write(bytesTab, 0, count);
+            }
+            fileOutputStream.close();
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }

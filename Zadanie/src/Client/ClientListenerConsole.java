@@ -20,10 +20,8 @@ public class ClientListenerConsole extends Thread {
                 userCommand.read(byt);
                 String sentence = byteToString(byt);
 
-                if(sentence != null) {
-                    MessageFromConsole messageClientConsole = new MessageFromConsole(sentence, number);
-                    messageClientConsole.answer();
-                }
+                MessageFromConsole messageClientConsole = new MessageFromConsole(sentence, number);
+                messageClientConsole.answer();
 
             } catch (IOException e) {
                 System.out.println("Error: " + e);
