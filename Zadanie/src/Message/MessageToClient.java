@@ -1,9 +1,6 @@
 package Message;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -15,21 +12,23 @@ public class MessageToClient {
     protected String sentence;
     protected int number;
     protected Socket socket;
+    protected InputStream inputStream;
+    protected OutputStream outputStream;
     protected DataOutputStream outToClient;
 
     public MessageToClient(String sentence, Socket socket, ArrayList<String> users) {
         this.sentence = sentence;
         this.socket = socket;
         this.users = users;
-    }
-
-    public void answer() {
-        String[] messageComponents = this.sentence.split(" ");
         try {
             outToClient = new DataOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
+    }
+
+    public void answer() {
+        String[] messageComponents = this.sentence.split(" ");
         switch (messageComponents[0]) {
             case "REGISTER":
                 if (!hostExist(messageComponents)) {
@@ -54,12 +53,16 @@ public class MessageToClient {
             case "LIST":
                 try {
                     files();
-                    byte[] bytes;
-                    bytes = stringToByte(fileList.toString());
+                    byte[] bytes = stringToByte(fileList.toString());
                     outToClient.write(bytes);
                 } catch (IOException e) {
                     System.out.println("Error: " + e);
                 }
+                break;
+            case "PULL":
+                int hostNumber = Integer.parseInt(messageComponents[1]);
+                String fileName = messageComponents[2];
+                pullFile(hostNumber, fileName);
                 break;
         }
     }
@@ -100,8 +103,8 @@ public class MessageToClient {
             String[] usersComponent = users.get(i).split(" ");
             int number = Integer.parseInt(usersComponent[0]);
             Socket socket = null;
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
+            inputStream = null;
+            outputStream = null;
             try {
                 socket = new Socket("127.0.0.1", PORT + number);
                 inputStream = socket.getInputStream();
@@ -139,6 +142,50 @@ public class MessageToClient {
             } catch (IOException e) {
                 System.out.println("Error: " + e);
             }
+        }
+    }
+
+    public void pullFile(int numb, String fileName) {
+        try {
+            Socket socket = new Socket("127.0.0.1", PORT + numb);
+            inputStream = socket.getInputStream();
+            outputStream = socket.getOutputStream();
+        } catch (UnknownHostException e) {
+            System.out.println("Error: " + e);
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+
+        try {
+            //wysyłamy żądanie PULL do wskazanego hosta
+            byte[] bytes = stringToByte("PULL " + fileName);
+            outputStream.write(bytes);
+
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = inputStream.read(bytesTab)) > 0) {
+                outToClient.write(bytesTab, 0, count);
+            }
+            inputStream.close();
+            outputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public void sendFile(String fileName) {
+        try {
+            File transferFile = new File("D://TORrent//" + fileName);
+            FileInputStream fileInputStream = new FileInputStream(transferFile);
+
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = fileInputStream.read(bytesTab)) > 0) {
+                this.outToClient.write(bytesTab, 0, count);
+            }
+            fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
         }
     }
 

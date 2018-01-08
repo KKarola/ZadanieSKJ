@@ -7,6 +7,7 @@ import java.net.Socket;
 public class ClientListenerConsole extends Thread {
     public static final int PORT = 10000;
     int number;
+    protected InputStream inFromServer;
 
     public ClientListenerConsole(int number) {
         this.number = number;
@@ -28,6 +29,7 @@ public class ClientListenerConsole extends Thread {
             try {
                 InputStream userCommand = System.in;
                 DataOutputStream outToServer = new DataOutputStream(clientListenerConsole.getOutputStream());
+                inFromServer = clientListenerConsole.getInputStream();
 
                 //wysłanie żądania wczytanego z konsoli
                 byte[] byt = new byte[1024];
@@ -37,12 +39,15 @@ public class ClientListenerConsole extends Thread {
                 outToServer.write(bytes);
 
                 //odbiór odpowiedzi od serwera
-                InputStream inFromServer = clientListenerConsole.getInputStream();
+                String[] name = sentence.split(" ");
                 byte[] b = new byte[1024];
-                inFromServer.read(b);
-                String sentences = byteToString(b);
-                System.out.println(sentences);
-
+                if(name[0].equals("PULL")) {
+                    pullFile(name[2]);
+                } else {
+                    inFromServer.read(b);
+                    String sentences = byteToString(b);
+                    System.out.println(sentences);
+                }
             } catch (IOException e) {
                 System.out.println("Error: " + e);
             }
@@ -101,4 +106,21 @@ public class ClientListenerConsole extends Thread {
         String date = new String(buffer, 0, buffer.length).trim();
         return date;
     }
+
+    public void pullFile(String fileName) {
+        try {
+            File files = new File("D://TORrent_" + number + "//" + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(files);
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = inFromServer.read(bytesTab)) > 0) {
+                fileOutputStream.write(bytesTab, 0, count);
+            }
+            fileOutputStream.close();
+            System.out.println(":))))))))))))))))");
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
 }

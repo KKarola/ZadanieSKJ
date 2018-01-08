@@ -12,6 +12,7 @@ public class MessageToServer {
     protected Socket socket;
     protected int number;
     protected DataOutputStream outToServer;
+    protected InputStream inFromClient;
     protected File file;
     protected ArrayList<String> files;
     protected ArrayList<String> listFile;
@@ -26,25 +27,20 @@ public class MessageToServer {
         String[] messageComponents = this.sentence.split(" ");
         try {
             outToServer = new DataOutputStream(this.socket.getOutputStream());
+            inFromClient = this.socket.getInputStream();
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
         switch (messageComponents[0]) {
             case "LIST":
-                try {
-                    listFileMD5();
-                    byte[] bytes;
-                    bytes = stringToByte(Integer.toString(listFile.size()));
-                    outToServer.write(bytes);
+                listFileMD5();
+                sendList();
+                break;
+            case "PULL":
+                sendFile(messageComponents[1]);
+                break;
+            case "PUSH":
 
-                    for (int i = 0; i < listFile.size(); i++) {
-                        byte[] bytesTab;
-                        bytesTab = stringToByte(listFile.get(i).toString());
-                        outToServer.write(bytesTab);
-                    }
-                } catch (IOException e) {
-                    System.out.println("Error: " + e);
-                }
                 break;
         }
     }
@@ -107,6 +103,36 @@ public class MessageToServer {
         }
     }
 
+    public void sendList() {
+        try {
+            byte[] bytes;
+            bytes = stringToByte(Integer.toString(listFile.size()));
+            outToServer.write(bytes);
 
+            for (int i = 0; i < listFile.size(); i++) {
+                byte[] bytesTab;
+                bytesTab = stringToByte(listFile.get(i).toString());
+                outToServer.write(bytesTab);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public void sendFile(String fileName) {
+        try {
+            File transferFile = new File("D://TORrent_" + number + "//" + fileName);
+            FileInputStream fileInputStream = new FileInputStream(transferFile);
+
+            byte[] bytesTab = new byte[1024];
+            int count;
+            while ((count = fileInputStream.read(bytesTab)) > 0) {
+                outToServer.write(bytesTab, 0, count);
+            }
+            fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
 
 }
