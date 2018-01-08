@@ -13,14 +13,12 @@ public class ServerListener extends Thread {
     public void run() {
         ServerSocket welcomeSocket = null;
 
-        //tworzenie gniazda nasłuchującego
         try {
             welcomeSocket = new ServerSocket(PORT);
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
 
-        //sprawdzanie połączenia klient-serwer, uruchomienie nowych wątków
         while (true) {
             try {
                 connectionSocket = welcomeSocket.accept();

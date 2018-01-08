@@ -52,8 +52,8 @@ import java.util.Arrays;
                 modifiedSentence = inFromServer.readLine();
                 System.out.println("FROM SERVER: " + modifiedSentence);
 
-                // zapisanie odebranego komunikatu jako obiekt MessageToClient
-                MessageToClient message = new MessageToClient(sentence);
+                // zapisanie odebranego komunikatu jako obiekt MessageFromServer
+                MessageFromServer message = new MessageFromServer(sentence);
 
                 // tutaj jest logika, jak obsługiwać komunikaty
                 switch (message.type) {

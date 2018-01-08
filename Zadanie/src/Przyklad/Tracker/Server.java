@@ -30,7 +30,7 @@ class Server {
             clientSentence = inFromClient.readLine();
             System.out.println("Otrzymano od klienta: " + clientSentence);
 
-            // zapisanie odebranego komunikatu jako obiekt MessageToClient
+            // zapisanie odebranego komunikatu jako obiekt MessageFromServer
             Message message = new Message(clientSentence);
 
             // tutaj jest logika, jak obsługiwać komunikaty

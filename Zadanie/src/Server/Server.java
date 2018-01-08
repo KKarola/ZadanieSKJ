@@ -15,7 +15,7 @@ public class Server extends Thread{
     String clientSentence;
     ServerSocket welcomeSocket;
     Socket connectionSocket;
-    BufferedReader inFromClient;
+    BufferedReader inputStream;
     DataOutputStream outToClient;
     ArrayList<String> users;
     ArrayList<String> files;
@@ -36,9 +36,9 @@ public class Server extends Thread{
             while (true) {
                 if(!welcomeSocket.isClosed()) {
                     connectionSocket = welcomeSocket.accept();
-                    inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                    inputStream = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                     outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                    clientSentence = inFromClient.readLine();
+                    clientSentence = inputStream.readLine();
                     System.out.println("Otrzymano od klienta: " + clientSentence);
 
                     //obsługa odebranego komunikatu
@@ -48,7 +48,7 @@ public class Server extends Thread{
                     //System.out.println(users.toString());
 
                     //outToClient.close();
-                    //inFromClient.close();
+                    //inputStream.close();
                 }
             }
 
@@ -112,7 +112,7 @@ public class Server extends Thread{
             InetAddress inetAdress = null;
             Socket server = null;
             outToClient = null;
-            inFromClient = null;
+            inputStream = null;
             String[] numb = users.get(i).split(" ");
             int port = Integer.valueOf(numb[2]);
             //sprawdzenie połączenia z klientami

@@ -14,7 +14,7 @@ public class ClientInfo extends Thread {
 
     public void run() {
         new ClientListenerConsole(number);
-        new ClientListenerServer(number);
+        new ClientListener(number);
         //register();
     }
 

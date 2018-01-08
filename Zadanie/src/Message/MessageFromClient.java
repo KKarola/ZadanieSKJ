@@ -7,30 +7,31 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MessageToServer {
+public class MessageFromClient {
     protected String sentence;
     protected Socket socket;
     protected int number;
-    protected DataOutputStream outToServer;
-    protected InputStream inFromClient;
+    protected OutputStream outputStream;
+    protected InputStream inputStream;
     protected File file;
     protected ArrayList<String> files;
     protected ArrayList<String> listFile;
 
-    public MessageToServer(String sentence, Socket socket, int number) {
+    public MessageFromClient(String sentence, Socket socket, int number) {
         this.sentence = sentence;
         this.socket = socket;
         this.number = number;
     }
 
     public void answer() {
-        String[] messageComponents = this.sentence.split(" ");
         try {
-            outToServer = new DataOutputStream(this.socket.getOutputStream());
-            inFromClient = this.socket.getInputStream();
+            outputStream = socket.getOutputStream();
+            inputStream = socket.getInputStream();
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
+
+        String[] messageComponents = sentence.split(" ");
         switch (messageComponents[0]) {
             case "LIST":
                 listFileMD5();
@@ -45,7 +46,6 @@ public class MessageToServer {
         }
     }
 
-    //zamiana Stringa na byte
     public byte[] stringToByte(String s) {
         byte[] buffer = new byte[1024];
         byte[] bytes = String.valueOf(s).getBytes();
@@ -55,14 +55,11 @@ public class MessageToServer {
         return buffer;
     }
 
-    //zapisanie byte do Stringa
     public String byteToString(byte buffer[]) {
         String date = new String(buffer, 0, buffer.length).trim();
         return date;
     }
 
-    // https://stackoverflow.com/questions/7301764/how-to-get-contents-of-a-folder-and-put-into-an-arraylist
-    //tworzenie listy plików znajdujących się w podanym katalogu
     public void listFile() {
         try{
             file = new File("D://TORrent_" + number);
@@ -73,7 +70,6 @@ public class MessageToServer {
     }
 
     // https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
-    // obliczanie sumy kontrolnej dla wszystkich plików w katalogu
     public void listFileMD5 () {
         listFile = new ArrayList<String>();
         listFile();
@@ -107,12 +103,12 @@ public class MessageToServer {
         try {
             byte[] bytes;
             bytes = stringToByte(Integer.toString(listFile.size()));
-            outToServer.write(bytes);
+            outputStream.write(bytes);
 
             for (int i = 0; i < listFile.size(); i++) {
                 byte[] bytesTab;
                 bytesTab = stringToByte(listFile.get(i).toString());
-                outToServer.write(bytesTab);
+                outputStream.write(bytesTab);
             }
         } catch (IOException e) {
             System.out.println("Error: " + e);
@@ -126,9 +122,10 @@ public class MessageToServer {
 
             byte[] bytesTab = new byte[1024];
             int count;
-            while ((count = fileInputStream.read(bytesTab)) > 0) {
-                outToServer.write(bytesTab, 0, count);
+            while ((count = fileInputStream.read(bytesTab)) > 0 ) {
+                outputStream.write(bytesTab, 0, count);
             }
+            outputStream.close();
             fileInputStream.close();
         } catch (IOException e) {
             System.out.println("Error: " + e);
