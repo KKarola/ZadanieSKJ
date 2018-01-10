@@ -49,13 +49,8 @@ public class MessageFromServer {
                 }
                 break;
             case "LIST":
-                try {
-                    files();
-                    byte[] bytes = stringToByte(fileList.toString());
-                    outToClient.write(bytes);
-                } catch (IOException e) {
-                    System.out.println("Error: " + e);
-                }
+                files();
+                sendList();
                 break;
         }
     }
@@ -127,6 +122,19 @@ public class MessageFromServer {
             } catch (IOException e) {
                 System.out.println("Error: " + e);
             }
+        }
+    }
+
+    public void sendList() {
+        try {
+            byte[] bytes = stringToByte(Integer.toString(fileList.size()));
+            outToClient.write(bytes);
+            for (int i = 0; i < fileList.size(); i++) {
+                byte[] byt = stringToByte(fileList.get(i));
+                outToClient.write(byt);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
         }
     }
 

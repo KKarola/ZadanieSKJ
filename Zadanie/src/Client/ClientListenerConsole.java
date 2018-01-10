@@ -8,9 +8,7 @@ public class ClientListenerConsole extends Thread {
     protected InputStream userCommand;
     int number;
 
-    public ClientListenerConsole(int number) {
-        this.number = number;
-    }
+    public ClientListenerConsole(int number) { this.number = number; }
 
     public void run() {
         while (true) {
