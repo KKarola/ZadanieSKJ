@@ -1,5 +1,6 @@
 package Client;
 
+import Config.Config;
 import Message.MessageFromClientHH;
 
 import java.io.IOException;
@@ -8,7 +9,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ClientListenerHH extends Thread{
-    public static final int PORT = 10000;
+    int port = Config.INSTANCE.getPort();
+    String ip = Config.INSTANCE.getIp();
+    int sizeOfPacket = Config.INSTANCE.getSizeOfPacket();
     protected ServerSocket clientListenerServer;
     protected Socket clientListenerSocket;
     protected InputStream inFromServer;
@@ -22,7 +25,7 @@ public class ClientListenerHH extends Thread{
         clientListenerServer = null;
 
         try {
-            clientListenerServer = new ServerSocket(PORT + number);
+            clientListenerServer = new ServerSocket(port + number);
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
@@ -33,7 +36,7 @@ public class ClientListenerHH extends Thread{
                 if(!clientListenerServer.isClosed()) {
                     inFromServer = clientListenerSocket.getInputStream();
 
-                    byte[] bytes = new byte[1024];
+                    byte[] bytes = new byte[sizeOfPacket];
                     inFromServer.read(bytes);
                     String sentence = byteToString(bytes);
 
@@ -47,14 +50,6 @@ public class ClientListenerHH extends Thread{
         }
     }
 
-    public byte[] stringToByte(String s) {
-        byte[] buffer = new byte[1024];
-        byte[] bytes = String.valueOf(s).getBytes();
-        for (int i = 0; i < bytes.length; i++) {
-            buffer[i] = bytes[i];
-        }
-        return buffer;
-    }
 
     public String byteToString(byte buffer[]) {
         String date = new String(buffer, 0, buffer.length).trim();

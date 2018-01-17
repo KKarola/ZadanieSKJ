@@ -1,5 +1,7 @@
 package Message;
 
+import Config.Config;
+
 import java.io.*;
 import java.net.Socket;
 import java.security.MessageDigest;
@@ -8,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MessageFromClientHH {
+    int sizeOfPacket = Config.INSTANCE.getSizeOfPacket();
+    String path = Config.INSTANCE.getPath();
     protected String sentence;
     protected Socket socket;
     protected int number;
@@ -56,7 +60,7 @@ public class MessageFromClientHH {
     }
 
     public byte[] stringToByte(String s) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[sizeOfPacket];
         byte[] bytes = String.valueOf(s).getBytes();
         for (int i = 0; i < bytes.length; i++) {
             buffer[i] = bytes[i];
@@ -66,7 +70,7 @@ public class MessageFromClientHH {
 
     public void listFile() {
         try{
-            file = new File("D://TORrent_" + number);
+            file = new File(path + number);
             files = new ArrayList<>(Arrays.asList(file.list()));
         } catch (NullPointerException e) {
             System.out.println("Error: " + e);
@@ -76,8 +80,8 @@ public class MessageFromClientHH {
     public void checksum(String fileName) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            FileInputStream fis = new FileInputStream("D://TORrent_" + number + "//" + fileName);
-            byte[] dataBytes = new byte[1024];
+            FileInputStream fis = new FileInputStream(path + number + "//" + fileName);
+            byte[] dataBytes = new byte[sizeOfPacket];
             int nread = 0;
             while ((nread = fis.read(dataBytes)) != -1) {
                 md.update(dataBytes, 0, nread);
@@ -122,10 +126,10 @@ public class MessageFromClientHH {
 
     public void sendFile(String[] messageComponents) {
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
+            File file = new File(path + number + "//" + messageComponents[1]);
             if (file.exists()) {
                 FileInputStream fileInputStream = new FileInputStream(file);
-                byte[] bytesTab = new byte[1024];
+                byte[] bytesTab = new byte[sizeOfPacket];
                 int count;
                 while ((count = fileInputStream.read(bytesTab)) > 0 ) {
                     outputStream.write(bytesTab, 0, count);
@@ -161,7 +165,7 @@ public class MessageFromClientHH {
 
     public void receiveFile(String[] messageComponents) {
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
+            File file = new File(path + number + "//" + messageComponents[1]);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             byte[] bytesTab = new byte[1024];
             int count;
@@ -178,12 +182,12 @@ public class MessageFromClientHH {
 
     public void reSendFile(String[] messageComponents){
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
+            File file = new File(path + number + "//" + messageComponents[1]);
             if (file.exists()) {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 long send = Long.parseLong(messageComponents[2]);
                 fileInputStream.skip(send);
-                byte[] bytesTab = new byte[1024];
+                byte[] bytesTab = new byte[sizeOfPacket];
                 int count;
                 while ((count = fileInputStream.read(bytesTab)) > 0 ) {
                     outputStream.write(bytesTab, 0, count);
@@ -203,13 +207,13 @@ public class MessageFromClientHH {
 
     public void reReceiveFile (String[] messageComponents) {
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
+            File file = new File(path + number + "//" + messageComponents[1]);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             String receiveLen = Long.toString(file.length());
             byte[] bytes = stringToByte(receiveLen);
             outputStream.write(bytes);
 
-            byte[] bytesTab = new byte[1024];
+            byte[] bytesTab = new byte[sizeOfPacket];
             int count;
             while ((count = inputStream.read(bytesTab)) > 0) {
                 fileOutputStream.write(bytesTab, 0, count);

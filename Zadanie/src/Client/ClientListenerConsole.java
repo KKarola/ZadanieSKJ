@@ -1,10 +1,12 @@
 package Client;
 
+import Config.Config;
 import Message.MessageFromConsole;
 
 import java.io.*;
 
 public class ClientListenerConsole extends Thread {
+    int sizeOfPacket = Config.INSTANCE.getSizeOfPacket();
     protected InputStream userCommand;
     protected int number;
 
@@ -14,7 +16,7 @@ public class ClientListenerConsole extends Thread {
         while (true) {
             try {
                 userCommand = System.in;
-                byte[] byt = new byte[1024];
+                byte[] byt = new byte[sizeOfPacket];
                 userCommand.read(byt);
                 String sentence = byteToString(byt);
 
