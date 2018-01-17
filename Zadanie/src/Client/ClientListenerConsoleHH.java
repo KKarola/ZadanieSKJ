@@ -1,14 +1,14 @@
 package Client;
 
-import Message.MessageFromConsole;
+import Message.MessageFromConsoleHH;
 
 import java.io.*;
 
-public class ClientListenerConsole extends Thread {
+public class ClientListenerConsoleHH extends Thread {
     protected InputStream userCommand;
     protected int number;
 
-    public ClientListenerConsole(int number) { this.number = number; }
+    public ClientListenerConsoleHH(int number) { this.number = number; }
 
     public void run() {
         while (true) {
@@ -18,7 +18,7 @@ public class ClientListenerConsole extends Thread {
                 userCommand.read(byt);
                 String sentence = byteToString(byt);
 
-                MessageFromConsole messageClientConsole = new MessageFromConsole(sentence, number);
+                MessageFromConsoleHH messageClientConsole = new MessageFromConsoleHH(sentence, number);
                 messageClientConsole.answer();
 
             } catch (IOException e) {

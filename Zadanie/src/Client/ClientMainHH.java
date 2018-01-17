@@ -1,8 +1,8 @@
 package Client;
 
-public class ClientMain {
+public class ClientMainHH {
     public static void main(String[] args) {
-        ClientStart clientStart = new ClientStart(1);
+        ClientStartHH clientStart = new ClientStartHH(1);
         clientStart.start();
     }
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class ServerSender extends Thread {
     protected Socket connectionClient;
     protected ArrayList<String> users;
-    InputStream inputStream;
+    protected InputStream inputStream;
 
     public ServerSender (Socket connectionClient, ArrayList<String> users) {
         this.connectionClient = connectionClient;

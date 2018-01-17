@@ -7,28 +7,27 @@ import java.nio.channels.FileLock;
 
 public class Multi extends Thread{
     public static final int PORT = 10000;
-    Socket socket = null;
-    int number;
-    InputStream inputStream = null;
-    OutputStream outputStream = null;
-    RandomAccessFile fileOutputStream = null;
-    FileChannel fileChannel;
-    String fileName;
-    int amountHost;
-    int hostNumber;
+    protected Socket socket = null;
+    protected int number;
+    protected InputStream inputStream = null;
+    protected OutputStream outputStream = null;
+    protected RandomAccessFile fileStream = null;
+    //protected FileChannel fileChannel;
+    protected String fileName;
+    protected int amountOfHost;
+    protected int yourNumber;
 
-    public Multi(RandomAccessFile fileOutputStream, int number, String fileName, int amountHost, int hostNumber, FileChannel fileChanel) {
-        this.fileOutputStream = fileOutputStream;
+    public Multi(RandomAccessFile fileStream, int number, String fileName, int amountOfHost, int yourNumber) {
+        this.fileStream = fileStream;
         this.number = number;
         this.fileName = fileName;
-        this.amountHost = amountHost;
-        this.hostNumber = hostNumber;
-        this.fileChannel = fileChanel;
+        this.amountOfHost = amountOfHost;
+        this.yourNumber = yourNumber;
+        //this.fileChannel = fileChanel;
     }
 
     public void run() {
         synchronized (fileName) {
-
             socket = null;
 
             try {
@@ -40,9 +39,10 @@ public class Multi extends Thread{
             }
 
             try {
-                byte[] bytes = stringToByte("MULTI " + fileName + " " + amountHost + " " + hostNumber);
+                byte[] bytes = stringToByte("MULTI " + fileName + " " + amountOfHost + " " + yourNumber);
                 outputStream.write(bytes);
 
+                //dostaje informacje nt. ilości paczek które wyśle dany host
                 byte[] byt = new byte[1024];
                 inputStream.read(byt);
                 String sentence = byteToString(byt);
@@ -50,13 +50,12 @@ public class Multi extends Thread{
 
                 byte[] bytesTab = new byte[1024];
                 int count;
-                FileLock lock = fileChannel.lock();
-                fileOutputStream.seek(hostNumber * pack * 1024);
+                //FileLock lock = fileChannel.lock();
+                fileStream.seek(yourNumber * pack * 1024);
                 while ((count = inputStream.read(bytesTab)) > 0) {
-                    System.out.println("Teraz działa " + hostNumber + " count: " + count);
-                    fileOutputStream.write(bytesTab, 0, count);
+                    fileStream.write(bytesTab, 0, count);
                 }
-                lock.release();
+                //lock.release();
             } catch (IOException e) {
                 System.out.println("Error: " + e);
             }

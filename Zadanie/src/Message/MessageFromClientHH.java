@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MessageFromClient {
+public class MessageFromClientHH {
     protected String sentence;
     protected Socket socket;
     protected int number;
@@ -19,7 +19,7 @@ public class MessageFromClient {
     protected StringBuffer sb;
     protected boolean fileOK;
 
-    public MessageFromClient(String sentence, Socket socket, int number) {
+    public MessageFromClientHH(String sentence, Socket socket, int number) {
         this.sentence = sentence;
         this.socket = socket;
         this.number = number;
@@ -51,9 +51,6 @@ public class MessageFromClient {
             case "PUSH_CONTINUE":
                 reReceiveFile(messageComponents);
                 break;
-            case "MULTI":
-                multi(messageComponents);
-                break;
 
         }
     }
@@ -70,7 +67,7 @@ public class MessageFromClient {
     public void listFile() {
         try{
             file = new File("D://TORrent_" + number);
-            files = new ArrayList<String>(Arrays.asList(file.list()));
+            files = new ArrayList<>(Arrays.asList(file.list()));
         } catch (NullPointerException e) {
             System.out.println("Error: " + e);
         }
@@ -130,7 +127,7 @@ public class MessageFromClient {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] bytesTab = new byte[1024];
                 int count;
-                while ((count = fileInputStream.read(bytesTab)) > 0) {
+                while ((count = fileInputStream.read(bytesTab)) > 0 ) {
                     outputStream.write(bytesTab, 0, count);
                 }
                 outputStream.close();
@@ -198,6 +195,7 @@ public class MessageFromClient {
                 outputStream.write(bytesTab);
                 outputStream.close();
             }
+
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
@@ -219,44 +217,6 @@ public class MessageFromClient {
             fileOutputStream.close();
             check(messageComponents);
             if (!fileOK) file.delete();
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
-    }
-
-    //String fileName, String amountOfHosts, String yourNumber
-    public void multi(String[] messageComponents) {
-        try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
-            RandomAccessFile fileInputStream = new RandomAccessFile(file, "rw");
-            int amountOfHost = Integer.parseInt(messageComponents[2]);
-            int myNumber = Integer.parseInt(messageComponents[3]);
-
-            //ustalenie ilości wszystkich paczek
-            int allPackages = (int) file.length()/1024;
-            if((file.length()%1024) != 0) allPackages++;
-            // ustalenie ile paczek wysyła pojedynczy host
-            int pack = allPackages / amountOfHost;
-            if((allPackages%amountOfHost) != 0) pack++;
-
-            byte[] bytesTab = new byte[1024];
-            fileInputStream.seek(myNumber*pack*1024);
-
-            byte[] bytes = stringToByte(Integer.toString(pack));
-            outputStream.write(bytes);
-
-            int count;
-            int i = 0;
-            try{
-                while ((count = fileInputStream.read(bytesTab)) > 0 & i < pack) {
-                    outputStream.write(bytesTab, 0, count);
-                    i++;
-                }
-            } catch (IOException e) {
-                System.out.println("Error: " + e);
-            }
-            outputStream.close();
-            fileInputStream.close();
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }

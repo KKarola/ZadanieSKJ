@@ -2,22 +2,22 @@ package Message;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
-public class MessageFromConsole {
-    public static final int PORT = 10000;
+public class MessageFromConsoleHH {
     protected String sentence;
     protected int number;
     protected String[] fileTab;
     protected StringBuffer sb;
+    protected int port;
     protected boolean fileOK;
 
-    public MessageFromConsole(String sentence, int number) {
+    public MessageFromConsoleHH(String sentence, int number) {
         this.sentence = sentence;
         this.number = number;
+        if(this.number == 1) port = 10002;
+        if(this.number == 2) port = 10001;
     }
 
     public void answer() {
@@ -37,12 +37,6 @@ public class MessageFromConsole {
                 break;
             case "PUSH_CONTINUE":
                 push_contiune(messageComponents);
-                break;
-            case "PULL_MULTI":
-                pull_multi(messageComponents);
-                break;
-            case "EXIT":
-                exit();
                 break;
         }
     }
@@ -66,7 +60,7 @@ public class MessageFromConsole {
         InputStream inFromServer = null;
         OutputStream outToServer = null;
         try {
-            socket = new Socket("127.0.0.1", PORT);
+            socket = new Socket("127.0.0.1", port);
             inFromServer = socket.getInputStream();
             outToServer = socket.getOutputStream();
         } catch (IOException e) {
@@ -134,10 +128,10 @@ public class MessageFromConsole {
     public void check(String[] messageComponents) {
         list();
         fileOK = false;
-        checksum(messageComponents[2]);
+        checksum(messageComponents[1]);
         for(int i = 0; i < fileTab.length; i++) {
             String[] component = fileTab[i].split(" ");
-            if(messageComponents[1].equals(component[0]) && messageComponents[2].equals(component[1]) && sb.toString().equals(component[2]))
+            if(sb.toString().equals(component[1]))
                 fileOK = true;
         }
         if(fileOK) {
@@ -148,12 +142,11 @@ public class MessageFromConsole {
     }
 
     public void pull(String[] messageComponents) {
-        int port = Integer.parseInt(messageComponents[1]);
         Socket socket = null;
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            socket = new Socket("127.0.0.1", PORT + port);
+            socket = new Socket("127.0.0.1", port);
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
         } catch (IOException e) {
@@ -161,14 +154,14 @@ public class MessageFromConsole {
         }
 
         try {
-            byte[] bytes = stringToByte("PULL " + messageComponents[2]);
+            byte[] bytes = stringToByte("PULL " + messageComponents[1]);
             outputStream.write(bytes);
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
 
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[2]);
+            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             byte[] bytesTab = new byte[1024];
             int count;
@@ -190,13 +183,12 @@ public class MessageFromConsole {
     }
 
     public void push(String[] messageComponents) {
-        int port = Integer.parseInt(messageComponents[1]);
         Socket socket = null;
         OutputStream outputStream = null;
         InputStream inputStream = null;
-        File file = new File("D://TORrent_" + number + "//" + messageComponents[2]);
+        File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
         try {
-            socket = new Socket("127.0.0.1", PORT + port);
+            socket = new Socket("127.0.0.1", port);
             outputStream = socket.getOutputStream();
             inputStream = socket.getInputStream();
         } catch (IOException e) {
@@ -204,9 +196,9 @@ public class MessageFromConsole {
         }
 
         try {
-            if(file.exists()) {
-                checksum(messageComponents[2]);
-                byte[] bytes = stringToByte("PUSH " + messageComponents[2] + " " + sb.toString());
+            if (file.exists()){
+                checksum(messageComponents[1]);
+                byte[] bytes = stringToByte("PUSH " + messageComponents[1] + " " + sb.toString());
                 outputStream.write(bytes);
 
                 FileInputStream fileInputStream = new FileInputStream(file);
@@ -236,12 +228,11 @@ public class MessageFromConsole {
     }
 
     public void pull_continue(String[] messageComponents) {
-        int port = Integer.parseInt(messageComponents[1]);
         Socket socket = null;
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            socket = new Socket("127.0.0.1", PORT + port);
+            socket = new Socket("127.0.0.1", port);
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
         } catch (IOException e) {
@@ -249,10 +240,10 @@ public class MessageFromConsole {
         }
 
         try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[2]);
+            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             String fileLen = Long.toString(file.length());
-            byte[] bytes = stringToByte("PULL_CONTINUE " + messageComponents[2] + " " + fileLen);
+            byte[] bytes = stringToByte("PULL_CONTINUE " + messageComponents[1] + " " + fileLen);
             outputStream.write(bytes);
 
             byte[] bytesTab = new byte[1024];
@@ -275,13 +266,12 @@ public class MessageFromConsole {
     }
 
     public void push_contiune (String[] messageComponents) {
-        int port = Integer.parseInt(messageComponents[1]);
         Socket socket = null;
         OutputStream outputStream = null;
         InputStream inputStream = null;
-        File file = new File("D://TORrent_" + number + "//" + messageComponents[2]);
+        File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
         try {
-            socket = new Socket("127.0.0.1", PORT + port);
+            socket = new Socket("127.0.0.1", port);
             outputStream = socket.getOutputStream();
             inputStream = socket.getInputStream();
         } catch (IOException e) {
@@ -289,15 +279,16 @@ public class MessageFromConsole {
         }
 
         try {
-            if(file.exists()) {
-                checksum(messageComponents[2]);
-                byte[] bytes = stringToByte("PUSH_CONTINUE " + messageComponents[2] + " " + sb.toString());
+            if (file.exists()) {
+                checksum(messageComponents[1]);
+                byte[] bytes = stringToByte("PUSH_CONTINUE " + messageComponents[1] + " " + sb.toString());
                 outputStream.write(bytes);
 
                 byte[] bytesTab = new byte[1024];
                 inputStream.read(bytesTab);
                 String send = byteToString(bytesTab);
                 long fileLen = Long.parseLong(send);
+
 
                 FileInputStream fileInputStream = new FileInputStream(file);
                 fileInputStream.skip(fileLen);
@@ -315,84 +306,14 @@ public class MessageFromConsole {
             } else {
                 System.out.println("Check the file name.");
             }
-        } catch (IOException e) {
+        }catch (IOException e) {
             System.out.println("Error: " + e);
         }
 
         try {
             socket.close();
         } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
-    }
-
-    public void pull_multi(String[] messageComponents) {
-        list();
-        String[] sentence;
-        //tworzymy listę hostów które mogą udostępnić plik
-        ArrayList<String> hostList = new ArrayList<>();
-        for (int i = 0; i < fileTab.length; i++) {
-            sentence = fileTab[i].split(" ");
-            if(sentence[1].equals(messageComponents[1]) && sentence[2].equals(messageComponents[2])) hostList.add(sentence[0]);
-        }
-
-        try {
-            File file = new File("D://TORrent_" + number + "//" + messageComponents[1]);
-            RandomAccessFile fileStream = new RandomAccessFile(file, "rw");
-            //FileChannel fileChannel = fileStream.getChannel();
-
-            Thread[] multi = new Thread[hostList.size()];
-            for (int i = 0; i < hostList.size(); i++) {
-                int number = Integer.parseInt(hostList.get(i));
-                multi[i] = new Thread(new Multi(fileStream, number, messageComponents[1], hostList.size(), i));
-                multi[i].start();
-            }
-
-            for (int i = 0; i < hostList.size(); i++) {
-                multi[i].join();
-            }
-            fileStream.close();
-
-            checksum(messageComponents[1]);
-            if(sb.toString().equals(messageComponents[2])) {
-                System.out.println("File transfer completed successfully.");
-            } else {
-                System.out.println("File transfer was not successfully.");
-            }
-        } catch (InterruptedException e) {
-            System.out.println("Error: " + e);
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
-    }
-
-    public void exit() {
-        Socket socket = null;
-        InputStream inFromServer = null;
-        OutputStream outToServer = null;
-        try {
-            socket = new Socket("127.0.0.1", PORT);
-            inFromServer = socket.getInputStream();
-            outToServer = socket.getOutputStream();
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
-
-        try {
-            byte[] bytes = stringToByte("EXIT " + number);
-            outToServer.write(bytes);
-
-            byte[] byt = new byte[1024];
-            inFromServer.read(byt);
-            System.out.println(byteToString(byt));
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
-
-        try {
-            socket.close();
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
+            System.out.println("ERROR: " + e);
         }
     }
 }

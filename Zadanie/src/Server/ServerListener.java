@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class ServerListener extends Thread {
     public static final int PORT = 10000;
     protected Socket connectionSocket;
-    protected ArrayList<String> users = new ArrayList<String>();
+    protected ArrayList<String> users = new ArrayList<>();
 
     public void run() {
         ServerSocket welcomeSocket = null;

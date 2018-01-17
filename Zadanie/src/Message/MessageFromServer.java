@@ -29,41 +29,15 @@ public class MessageFromServer {
         String[] messageComponents = this.sentence.split(" ");
         switch (messageComponents[0]) {
             case "REGISTER":
-                if (!hostExist(messageComponents)) {
-                    try {
-                        int number = Integer.parseInt(messageComponents[1]);
-                        String clients = messageComponents[1] + " " + messageComponents[2] + " " + messageComponents[3];
-                        users.add(clients);
-                        byte[] bytes = stringToByte("Zarejestrowano klienta o numerze " + Integer.toString(number));
-                        outToClient.write(bytes);
-                    } catch (IOException e) {
-                        System.out.println("Error: " + e);
-                    }
-                } else {
-                    try {
-                        byte[] bytes = stringToByte("Klient o podanym numerze już istnieje.");
-                        outToClient.write(bytes);
-                    } catch (IOException e) {
-                        System.out.println("Error: " + e);
-                    }
-                }
+                register(messageComponents);
                 break;
             case "LIST":
-                files();
                 sendList();
                 break;
+            case "EXIT":
+                exit(messageComponents[1]);
+                break;
         }
-    }
-
-    public boolean hostExist(String[] messageComponents) {
-        boolean hostExist = false;
-        for (int i = 0; i < users.size(); i++) {
-            String[] numb = users.get(i).split(" ");
-            if (messageComponents[1].equals(numb[0])) {
-                hostExist = true;
-            }
-        }
-        return hostExist;
     }
 
     public byte[] stringToByte(String s) {
@@ -80,7 +54,38 @@ public class MessageFromServer {
         return date;
     }
 
-    //tworzenie listy plików dostępnianych przez poszczególne hosty
+    public boolean hostExist(String[] messageComponents) {
+        boolean hostExist = false;
+        for (int i = 0; i < users.size(); i++) {
+            String[] numb = users.get(i).split(" ");
+            if (messageComponents[1].equals(numb[0])) {
+                hostExist = true;
+            }
+        }
+        return hostExist;
+    }
+
+    public void register(String[] messageComponents) {
+        if (!hostExist(messageComponents)) {
+            try {
+                int number = Integer.parseInt(messageComponents[1]);
+                String clients = messageComponents[1] + " " + messageComponents[2] + " " + messageComponents[3];
+                users.add(clients);
+                byte[] bytes = stringToByte("Registered successfully - number " + Integer.toString(number));
+                outToClient.write(bytes);
+            } catch (IOException e) {
+                System.out.println("Error: " + e);
+            }
+        } else {
+            try {
+                byte[] bytes = stringToByte("The client exists.");
+                outToClient.write(bytes);
+            } catch (IOException e) {
+                System.out.println("Error: " + e);
+            }
+        }
+    }
+
     public void files() {
         fileList = new ArrayList<String>();
         for (int i = 0; i < users.size(); i++) {
@@ -110,8 +115,7 @@ public class MessageFromServer {
                 for (int j = 0; j < Integer.parseInt(sentence); j++) {
                     byte[] bytesTab = new byte[1024];
                     inputStream.read(bytesTab);
-                    String sentence1 = byteToString(bytesTab);
-                    fileList.add(Integer.toString(number) + " " + sentence1);
+                    fileList.add(Integer.toString(number) + " " + byteToString(bytesTab));
                 }
             } catch (IOException e) {
                 System.out.println("Error: " + e);
@@ -126,12 +130,28 @@ public class MessageFromServer {
     }
 
     public void sendList() {
+        files();
         try {
             byte[] bytes = stringToByte(Integer.toString(fileList.size()));
             outToClient.write(bytes);
             for (int i = 0; i < fileList.size(); i++) {
                 byte[] byt = stringToByte(fileList.get(i));
                 outToClient.write(byt);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public void exit(String messageComponent) {
+        try {
+            for(int i = 0; i < users.size(); i++) {
+                String[] number = users.get(i).split(" ");
+                if(number[0].equals(messageComponent)) {
+                    users.remove(i);
+                    byte[] bytes = stringToByte("Unregistered successfully.");
+                    outToClient.write(bytes);
+                }
             }
         } catch (IOException e) {
             System.out.println("Error: " + e);
